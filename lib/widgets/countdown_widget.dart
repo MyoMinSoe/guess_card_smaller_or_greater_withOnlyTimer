@@ -47,9 +47,31 @@ class _PeriodicTimerWidgetState extends State<PeriodicTimerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      'Time Left - 00:0$timecount',
-      style: const TextStyle(fontSize: 30),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        const Text(
+          'Time Left - ',
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 40,
+            fontWeight: FontWeight.w300,
+          ),
+        ),
+        const Icon(
+          Icons.timelapse,
+          size: 50,
+          color: Colors.red,
+        ),
+        Text(
+          '00:0$timecount',
+          style: const TextStyle(
+            color: Colors.red,
+            fontSize: 40,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
     );
   }
 }

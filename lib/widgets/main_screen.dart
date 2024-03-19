@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:guess_card_smaller_or_greater/widgets/countdown_widget.dart';
+import 'package:guess_card_smaller_or_greater/widgets/flip_card.dart';
 
 class MainScreen extends StatefulWidget {
   MainScreen({
@@ -19,22 +20,28 @@ class _MainScreenState extends State<MainScreen> {
       padding: const EdgeInsets.all(5),
       child: Center(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            Row(
-              children: [
-                Text(
-                  'Your Point : $point',
-                  style: const TextStyle(fontSize: 30),
-                ),
-                const Spacer(),
-                PeriodicTimerWidget(
-                    point: point,
-                    onCountChange: (int pt) {
-                      point += pt;
-                      setState(() {});
-                    })
-              ],
+            Text(
+              'Your Point : $point',
+              style: const TextStyle(
+                fontSize: 40,
+                fontWeight: FontWeight.w900,
+                color: Colors.deepPurple,
+              ),
             ),
+            PeriodicTimerWidget(
+                point: point,
+                onCountChange: (int pt) {
+                  point = pt;
+                  setState(() {});
+                }),
+            FlipCardAndButton(
+                point: point,
+                onCheck: (int p) {
+                  point += p;
+                  setState(() {});
+                }),
           ],
         ),
       ),

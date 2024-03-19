@@ -13,8 +13,8 @@ class CardList {
     CardModel(image: Assets.assets8, number: 8),
     CardModel(image: Assets.assets9, number: 9),
     CardModel(image: Assets.assets10, number: 10),
-    CardModel(image: Assets.assetsJ, number: 11),
-    CardModel(image: Assets.assetsK, number: 12),
-    CardModel(image: Assets.assetsQ, number: 13),
+    CardModel(image: Assets.assetsJack, number: 11),
+    CardModel(image: Assets.assetsKing, number: 12),
+    CardModel(image: Assets.assetsQueen, number: 13),
   ];
 }
