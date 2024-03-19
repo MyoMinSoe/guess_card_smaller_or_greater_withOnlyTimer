@@ -1,7 +1,6 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_flip_card/controllers/flip_card_controllers.dart';
-import 'package:flutter_flip_card/flipcard/flip_card.dart';
 import 'package:flutter_flip_card/flutter_flip_card.dart';
 import 'package:guess_card_smaller_or_greater/card_model_and_list/card_list.dart';
 import 'package:guess_card_smaller_or_greater/card_model_and_list/card_model.dart';
@@ -21,8 +20,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   int point = 0;
 
-  late final myController =
-      AnimationController(duration: Duration(milliseconds: 800), vsync: this);
+  List<String> preditButton = ['Smaller', 'Bigger', 'Equal'];
+  bool enableButton = true;
+  bool enableNextRound = false;
+
+  late final myController = AnimationController(
+      duration: const Duration(milliseconds: 600), vsync: this);
   late final myAnimation =
       Tween<double>(begin: 1, end: 0).animate(myController);
 
@@ -35,7 +38,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     card2.addAll(CardList().cardlist);
     card1.shuffle();
     card2.shuffle();
-    // TODO: implement initState
     myController.forward();
     super.initState();
   }
@@ -43,7 +45,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   @override
   void dispose() {
     myController.dispose();
-    // TODO: implement dispose
     super.dispose();
   }
 
@@ -53,18 +54,27 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       color: Colors.pink.withOpacity(0.2),
       child: Column(
         children: [
-          Text('Point : $point'),
+          Text(
+            'Point  -  $point',
+            style: const TextStyle(
+              color: Color.fromARGB(255, 12, 0, 67),
+              fontSize: 40,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               AnimatedBuilder(
                 animation: myAnimation,
                 builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(-myAnimation.value * 250, 0),
+                  return Transform.rotate(
+                    angle: -myAnimation.value * 1,
+                    origin: Offset(-200, 200),
+                    // offset: Offset(-myAnimation.value * 250, 0),
                     child: SizedBox(
                       width: 180,
-                      height: 400,
+                      height: 300,
                       child: Image.asset(card1[index].image),
                     ),
                   );
@@ -77,7 +87,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     offset: Offset(myAnimation.value * 400, 0),
                     child: SizedBox(
                       width: 180,
-                      height: 400,
+                      height: 300,
                       child: FlipCard(
                         key: cardkey,
                         backWidget: Image.asset(card2[index].image),
@@ -91,24 +101,41 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               ),
             ],
           ),
-          ElevatedButton(
-            onPressed: () {
-              cardkey.currentState!.filpCard();
-            },
-            child: Text('check'),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              for (int i = 0; i < 3; i++)
+                ElevatedButton(
+                  onPressed: enableButton
+                      ? () {
+                          cardkey.currentState!.filpCard();
+                          enableButton = false;
+                          enableNextRound = true;
+                          setState(() {});
+                        }
+                      : null,
+                  child: Text(preditButton[i]),
+                ),
+            ],
           ),
           ElevatedButton(
-            onPressed: () {
-              if (!cardkey.currentState!.isFront) {
-                cardkey.currentState!.filpCard();
-              }
-              if (myAnimation.status == AnimationStatus.completed) {
-                myController.reset();
-              }
-              index++;
-              myController.forward();
-              setState(() {});
-            },
+            onPressed: enableNextRound
+                ? () {
+                    if (!cardkey.currentState!.isFront) {
+                      cardkey.currentState!.filpCard();
+                    }
+                    if (myAnimation.status == AnimationStatus.completed) {
+                      myController.reset();
+                    }
+
+                    myController.forward();
+                    enableButton = true;
+                    enableNextRound = false;
+                    setState(() {});
+                    card1.shuffle();
+                    card2.shuffle();
+                  }
+                : null,
             child: Text('Next Round'),
           ),
         ],

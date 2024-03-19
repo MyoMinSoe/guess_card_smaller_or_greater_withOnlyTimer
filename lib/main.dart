@@ -10,11 +10,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Material App',
+      title: 'Flip Card',
       home: Scaffold(
         appBar: AppBar(
-          backgroundColor: const Color.fromARGB(255, 251, 17, 0),
-          title: const Text('Material App Bar'),
+          backgroundColor: const Color.fromARGB(255, 12, 0, 67),
+          foregroundColor: Colors.white,
+          title: const Text('Flip Card'),
         ),
         body: MainScreen(),
       ),
