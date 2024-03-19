@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:guess_card_smaller_or_greater/widgets/countdown_widget.dart';
 
 class MainScreen extends StatefulWidget {
-  Duration duration = Duration(seconds: 3);
   MainScreen({
     super.key,
   });
@@ -23,17 +22,19 @@ class _MainScreenState extends State<MainScreen> {
           children: [
             Row(
               children: [
-                Text('Your Point : $point'),
-                CountDownWidget(duration: widget.duration),
+                Text(
+                  'Your Point : $point',
+                  style: const TextStyle(fontSize: 30),
+                ),
+                const Spacer(),
+                PeriodicTimerWidget(
+                    point: point,
+                    onCountChange: (int pt) {
+                      point += pt;
+                      setState(() {});
+                    })
               ],
             ),
-            ElevatedButton(
-                onPressed: () {
-                  widget.duration = Duration(seconds: 3);
-                  CountDownWidgetState().startTimer();
-                  setState(() {});
-                },
-                child: Text('set time'))
           ],
         ),
       ),
