@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:guess_card_smaller_or_greater/widgets/countdown_widget.dart';
 
 class MainScreen extends StatefulWidget {
-  const MainScreen({
+  Duration duration = Duration(seconds: 3);
+  MainScreen({
     super.key,
   });
 
@@ -10,10 +12,31 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  int point = 0;
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('Hello World'),
+    return Container(
+      color: Colors.pink.withOpacity(0.2),
+      padding: const EdgeInsets.all(5),
+      child: Center(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                Text('Your Point : $point'),
+                CountDownWidget(duration: widget.duration),
+              ],
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  widget.duration = Duration(seconds: 3);
+                  CountDownWidgetState().startTimer();
+                  setState(() {});
+                },
+                child: Text('set time'))
+          ],
+        ),
+      ),
     );
   }
 }
