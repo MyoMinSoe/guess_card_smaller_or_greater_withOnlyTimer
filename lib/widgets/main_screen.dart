@@ -1,10 +1,9 @@
-import 'dart:ffi';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_flip_card/flutter_flip_card.dart';
 import 'package:guess_card_smaller_or_greater/card_model_and_list/card_list.dart';
 import 'package:guess_card_smaller_or_greater/card_model_and_list/card_model.dart';
 import 'package:guess_card_smaller_or_greater/constants/assets.dart';
+import 'package:lottie/lottie.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -24,6 +23,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   bool enableButton = true;
   bool enableNextRound = false;
 
+  late final lottieController = AnimationController(vsync: this);
+
   late final myController = AnimationController(
       duration: const Duration(milliseconds: 600), vsync: this);
   late final myAnimation =
@@ -39,13 +40,83 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     card1.shuffle();
     card2.shuffle();
     myController.forward();
+
     super.initState();
   }
 
   @override
   void dispose() {
     myController.dispose();
+    lottieController.dispose();
     super.dispose();
+  }
+
+  void checkCard(String s) {
+    switch (s) {
+      case 'Smaller':
+        if (card1[index].number < card2[index].number) {
+          point++;
+        } else {
+          point--;
+        }
+        break;
+      case 'Bigger':
+        if (card1[index].number > card2[index].number) {
+          point++;
+        } else {
+          point--;
+        }
+        break;
+      case 'Equal':
+        if (card1[index].number == card2[index].number) {
+          point++;
+        } else {
+          point--;
+        }
+        break;
+      default:
+    }
+    if (point == 2) {
+      showDialog(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            icon: Lottie.asset(
+              controller: lottieController,
+              'images/won_cup.json',
+              repeat: true,
+              width: 80,
+              height: 80,
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('back'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+    setState(() {});
+  }
+
+  void nextRound() {
+    if (!cardkey.currentState!.isFront) {
+      cardkey.currentState!.filpCard();
+    }
+    if (myAnimation.status == AnimationStatus.completed) {
+      myController.reset();
+    }
+
+    myController.forward();
+    enableButton = true;
+    enableNextRound = false;
+    setState(() {});
+    card1.shuffle();
+    card2.shuffle();
   }
 
   @override
@@ -108,6 +179,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                 ElevatedButton(
                   onPressed: enableButton
                       ? () {
+                          checkCard(preditButton[i]);
                           cardkey.currentState!.filpCard();
                           enableButton = false;
                           enableNextRound = true;
@@ -121,19 +193,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
           ElevatedButton(
             onPressed: enableNextRound
                 ? () {
-                    if (!cardkey.currentState!.isFront) {
-                      cardkey.currentState!.filpCard();
-                    }
-                    if (myAnimation.status == AnimationStatus.completed) {
-                      myController.reset();
-                    }
-
-                    myController.forward();
-                    enableButton = true;
-                    enableNextRound = false;
-                    setState(() {});
-                    card1.shuffle();
-                    card2.shuffle();
+                    nextRound();
                   }
                 : null,
             child: Text('Next Round'),
