@@ -35,14 +35,15 @@ class _GamePlayScreenState extends State<GamePlayScreen>
   final flipcardController = FlipCardController();
   GlobalKey<FlipCardState> cardkey = GlobalKey();
 
-  late Timer time;
+  Timer? time;
   int timeCount = 5;
+  //*********** Predit Time Counter Function ***************** */
   void startTimeCount() {
     time = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (timeCount == 0) {
-        time.cancel();
+        --point;
+        time?.cancel();
         enableButton = false;
-        point--;
         roundCount = 5;
         roundCounter();
 
@@ -56,6 +57,7 @@ class _GamePlayScreenState extends State<GamePlayScreen>
 
   late Timer roundTime;
   int roundCount = 5;
+  //****** Round Counter Timer Function************ */
   void roundCounter() {
     roundTime = Timer.periodic(
       const Duration(seconds: 1),
@@ -82,6 +84,8 @@ class _GamePlayScreenState extends State<GamePlayScreen>
     card1.shuffle();
     card2.shuffle();
 
+    enableButton = false;
+
     myController.forward();
 
     roundCounter();
@@ -91,12 +95,13 @@ class _GamePlayScreenState extends State<GamePlayScreen>
 
   @override
   void dispose() {
-    time.cancel();
+    time?.cancel();
     roundTime.cancel();
     myController.dispose();
     super.dispose();
   }
 
+//*********** Flip Card Check Function**************************** */
   void checkCard(String s) {
     switch (s) {
       case 'Smaller':
@@ -123,6 +128,11 @@ class _GamePlayScreenState extends State<GamePlayScreen>
       default:
     }
     if (point == winPoint) {
+      roundCount = 0;
+      timeCount = 0;
+      time?.cancel();
+      roundTime.cancel();
+      setState(() {});
       showDialog(
         context: context,
         builder: (_) {
@@ -171,9 +181,9 @@ class _GamePlayScreenState extends State<GamePlayScreen>
                   ),
                 ),
                 onPressed: () {
+                  Navigator.of(context).pop();
                   point = 0;
                   setState(() {});
-                  Navigator.of(context).pop();
                 },
                 child: const Text(
                   'Play Again',
@@ -210,6 +220,7 @@ class _GamePlayScreenState extends State<GamePlayScreen>
     setState(() {});
   }
 
+//************** Round Begin function *********************** */
   void nextRound() {
     if (!cardkey.currentState!.isFront) {
       cardkey.currentState!.filpCard();
@@ -232,186 +243,200 @@ class _GamePlayScreenState extends State<GamePlayScreen>
     Size size = MediaQuery.of(context).size;
     double high = size.height;
     double width = size.width;
-    return Container(
-      color: Colors.pink.withOpacity(0.2),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Win Point  $winPoint |',
-                  style: const TextStyle(
-                    color: Color.fromARGB(255, 151, 113, 0),
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 12, 0, 67),
+        foregroundColor: Colors.white,
+        title: const Text('Game Screen'),
+      ),
+      body: Container(
+        color: Colors.pink.withOpacity(0.2),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  //********** Win Point ************************** */
+                  Text(
+                    'Win Point  $winPoint |',
+                    style: const TextStyle(
+                      color: Color.fromARGB(255, 151, 113, 0),
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+                  //**************** Point ************************ */
+                  Text(
+                    '| Point  $point',
+                    style: const TextStyle(
+                      color: Color.fromARGB(255, 12, 0, 67),
+                      fontSize: 30,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            //***************** Countdown Timer ****************** */
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(
+                  color: Color.fromARGB(255, 20, 1, 105),
+                  width: 5,
                 ),
-                Text(
-                  '| Point  $point',
-                  style: const TextStyle(
-                    color: Color.fromARGB(255, 12, 0, 67),
-                    fontSize: 30,
-                    fontWeight: FontWeight.bold,
+              ),
+              width: width * 0.9,
+              height: high * 0.1,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    alignment: Alignment.center,
+                    width: width * 0.4,
+                    height: high * 0.1,
+                    color: Color.fromARGB(255, 20, 1, 105),
+                    child: const Text(
+                      'Time Left',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 30,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
                   ),
+                  Container(
+                    alignment: Alignment.center,
+                    width: width * 0.4,
+                    height: high * 0.1,
+                    child: Row(
+                      children: [
+                        const Icon(
+                          color: Color.fromARGB(255, 180, 12, 0),
+                          Icons.timelapse,
+                          size: 50,
+                        ),
+                        Text(
+                          '00:0$timeCount',
+                          style: const TextStyle(
+                            color: Color.fromARGB(255, 180, 12, 0),
+                            fontSize: 40,
+                            fontWeight: FontWeight.w300,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                //************* Show Card image ****************** */
+                AnimatedBuilder(
+                  animation: myAnimation,
+                  builder: (context, child) {
+                    return Transform.rotate(
+                      angle: -myAnimation.value * 1,
+                      origin: Offset(-200, 200),
+                      // offset: Offset(-myAnimation.value * 250, 0),
+                      child: SizedBox(
+                        width: 180,
+                        height: 300,
+                        child: Image.asset(card1[index].image),
+                      ),
+                    );
+                  },
+                ),
+                //*************** Flip Card image ******************/
+                AnimatedBuilder(
+                  animation: myAnimation,
+                  builder: (context, child) {
+                    return Transform.translate(
+                      offset: Offset(myAnimation.value * 400, 0),
+                      child: SizedBox(
+                        width: 180,
+                        height: 300,
+                        child: FlipCard(
+                          key: cardkey,
+                          backWidget: Image.asset(card2[index].image),
+                          frontWidget: Image.asset(Assets.assetsBack),
+                          controller: flipcardController,
+                          rotateSide: RotateSide.bottom,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ],
             ),
-          ),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: Color.fromARGB(255, 20, 1, 105),
-                width: 5,
-              ),
-            ),
-            width: width * 0.9,
-            height: high * 0.1,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //**********Smaller Bigger Equal - Buttons *************/
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Container(
-                  alignment: Alignment.center,
-                  width: width * 0.4,
-                  height: high * 0.1,
-                  color: Color.fromARGB(255, 20, 1, 105),
-                  child: const Text(
-                    'Time Left',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30,
-                      fontWeight: FontWeight.w400,
+                for (int i = 0; i < 3; i++)
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.all(20),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    onPressed: enableButton
+                        ? () {
+                            timeCount = 0;
+                            time?.cancel();
+                            checkCard(preditButton[i]);
+                            cardkey.currentState!.filpCard();
+                            enableButton = false;
+                            roundCount = 5;
+                            roundCounter();
+
+                            setState(() {});
+                          }
+                        : null,
+                    child: Text(
+                      preditButton[i],
+                      style: const TextStyle(fontSize: 20),
                     ),
                   ),
-                ),
-                Container(
-                  alignment: Alignment.center,
-                  width: width * 0.4,
-                  height: high * 0.1,
-                  child: Row(
+              ],
+            ),
+            //******************* Round Begin 0 ****************** */
+            SizedBox(
+              width: width * 0.9,
+              height: high * 0.2,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      const Icon(
-                        color: Color.fromARGB(255, 180, 12, 0),
-                        Icons.timelapse,
-                        size: 50,
+                      Text(
+                        'Round Begin',
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 40,
+                        ),
                       ),
                       Text(
-                        '00:0$timeCount',
-                        style: const TextStyle(
-                          color: Color.fromARGB(255, 180, 12, 0),
-                          fontSize: 40,
-                          fontWeight: FontWeight.w300,
-                        ),
+                        '$roundCount',
+                        style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize: 90,
+                            fontWeight: FontWeight.w700),
                       ),
                     ],
                   ),
-                ),
-              ],
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              AnimatedBuilder(
-                animation: myAnimation,
-                builder: (context, child) {
-                  return Transform.rotate(
-                    angle: -myAnimation.value * 1,
-                    origin: Offset(-200, 200),
-                    // offset: Offset(-myAnimation.value * 250, 0),
-                    child: SizedBox(
-                      width: 180,
-                      height: 300,
-                      child: Image.asset(card1[index].image),
-                    ),
-                  );
-                },
+                ],
               ),
-              AnimatedBuilder(
-                animation: myAnimation,
-                builder: (context, child) {
-                  return Transform.translate(
-                    offset: Offset(myAnimation.value * 400, 0),
-                    child: SizedBox(
-                      width: 180,
-                      height: 300,
-                      child: FlipCard(
-                        key: cardkey,
-                        backWidget: Image.asset(card2[index].image),
-                        frontWidget: Image.asset(Assets.assetsBack),
-                        controller: flipcardController,
-                        rotateSide: RotateSide.bottom,
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              for (int i = 0; i < 3; i++)
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  onPressed: enableButton
-                      ? () {
-                          timeCount = 0;
-                          time.cancel();
-                          checkCard(preditButton[i]);
-                          cardkey.currentState!.filpCard();
-                          enableButton = false;
-                          roundCount = 5;
-                          roundCounter();
-
-                          setState(() {});
-                        }
-                      : null,
-                  child: Text(
-                    preditButton[i],
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                ),
-            ],
-          ),
-          SizedBox(
-            width: width * 0.9,
-            height: high * 0.2,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Text(
-                      'Round Begin',
-                      style: TextStyle(
-                        color: Colors.grey[700],
-                        fontSize: 40,
-                      ),
-                    ),
-                    Text(
-                      '$roundCount',
-                      style: TextStyle(
-                          color: Colors.grey[700],
-                          fontSize: 90,
-                          fontWeight: FontWeight.w700),
-                    ),
-                  ],
-                ),
-              ],
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
