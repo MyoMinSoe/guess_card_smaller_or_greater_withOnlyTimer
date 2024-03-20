@@ -105,14 +105,14 @@ class _GamePlayScreenState extends State<GamePlayScreen>
   void checkCard(String s) {
     switch (s) {
       case 'Smaller':
-        if (card1[index].number < card2[index].number) {
+        if (card1[index].number > card2[index].number) {
           point++;
         } else {
           point--;
         }
         break;
       case 'Bigger':
-        if (card1[index].number > card2[index].number) {
+        if (card1[index].number < card2[index].number) {
           point++;
         } else {
           point--;
@@ -182,6 +182,8 @@ class _GamePlayScreenState extends State<GamePlayScreen>
                 onPressed: () {
                   Navigator.of(context).pop();
                   point = 0;
+                  roundCount = 5;
+                  roundCounter();
                   setState(() {});
                 },
                 child: const Text(

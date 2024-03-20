@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:guess_card_smaller_or_greater/widgets/game_play_screen.dart';
+import 'package:lottie/lottie.dart';
 
 class MenuScreen extends StatefulWidget {
   @override
@@ -25,8 +28,13 @@ class _MenuScreenState extends State<MenuScreen> {
       child: Center(
         child: Form(
           key: formController,
-          child: Column(
+          child: ListView(
             children: [
+              Lottie.asset(
+                'images/cat_playing.json',
+                width: 300,
+                height: 200,
+              ),
               const Text(
                 textAlign: TextAlign.center,
                 'Enter Your Win Point...',
@@ -66,7 +74,7 @@ class _MenuScreenState extends State<MenuScreen> {
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange[200],
-                    padding: const EdgeInsets.all(30),
+                    padding: const EdgeInsets.all(20),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30))),
                 onPressed: () {
@@ -86,8 +94,29 @@ class _MenuScreenState extends State<MenuScreen> {
                   'START',
                   style: TextStyle(
                     color: Colors.red,
-                    fontSize: 25,
+                    fontSize: 40,
                     fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 30),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange[200],
+                      padding: const EdgeInsets.all(20),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                  onPressed: () {
+                    exit(0);
+                  },
+                  child: const Text(
+                    'EXIT',
+                    style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 40,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
