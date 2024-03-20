@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:guess_card_smaller_or_greater/widgets/main_screen.dart';
+import 'package:guess_card_smaller_or_greater/widgets/menu_screen.dart';
 
 void main() => runApp(const MyApp());
 
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
           foregroundColor: Colors.white,
           title: const Text('Flip Card'),
         ),
-        body: MainScreen(),
+        body: MenuScreen(),
       ),
     );
   }

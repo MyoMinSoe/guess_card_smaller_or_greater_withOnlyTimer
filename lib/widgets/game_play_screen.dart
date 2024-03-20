@@ -8,19 +8,20 @@ import 'package:guess_card_smaller_or_greater/card_model_and_list/card_model.dar
 import 'package:guess_card_smaller_or_greater/constants/assets.dart';
 import 'package:lottie/lottie.dart';
 
-class MainScreen extends StatefulWidget {
-  const MainScreen({super.key});
+class GamePlayScreen extends StatefulWidget {
+  const GamePlayScreen({super.key});
 
   @override
-  State<MainScreen> createState() => _MainScreenState();
+  State<GamePlayScreen> createState() => _GamePlayScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
+class _GamePlayScreenState extends State<GamePlayScreen>
+    with TickerProviderStateMixin {
   List<CardModel> card1 = [];
   List<CardModel> card2 = [];
   int index = 0;
   int point = 0;
-  int winPoint = 2;
+  int winPoint = 0;
 
   List<String> preditButton = ['Smaller', 'Bigger', 'Equal'];
   bool enableButton = true;
@@ -40,16 +41,38 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     time = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (timeCount == 0) {
         time.cancel();
-        timeCount = 5;
+        enableButton = false;
         point--;
-        nextRound();
-        startTimeCount();
+        roundCount = 5;
+        roundCounter();
+
         setState(() {});
       } else {
         timeCount--;
       }
       setState(() {});
     });
+  }
+
+  late Timer roundTime;
+  int roundCount = 5;
+  void roundCounter() {
+    roundTime = Timer.periodic(
+      const Duration(seconds: 1),
+      (timer) {
+        if (roundCount == 0) {
+          roundTime.cancel();
+          enableButton = true;
+          timeCount = 5;
+          nextRound();
+          startTimeCount();
+          setState(() {});
+        } else {
+          roundCount--;
+        }
+        setState(() {});
+      },
+    );
   }
 
   @override
@@ -61,7 +84,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
     myController.forward();
 
-    startTimeCount();
+    roundCounter();
 
     super.initState();
   }
@@ -69,6 +92,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
   @override
   void dispose() {
     time.cancel();
+    roundTime.cancel();
     myController.dispose();
     super.dispose();
   }
@@ -196,7 +220,6 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
     myController.forward();
     enableButton = true;
-    enableNextRound = false;
     setState(() {});
     card1.shuffle();
     card2.shuffle();
@@ -204,6 +227,8 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    String text = ModalRoute.of(context)!.settings.arguments as String;
+    winPoint = int.parse(text);
     Size size = MediaQuery.of(context).size;
     double high = size.height;
     double width = size.width;
@@ -212,16 +237,28 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Text(
-            'If You get $winPoint Point, You Win !',
-            style: TextStyle(fontSize: 25),
-          ),
-          Text(
-            'Point     $point',
-            style: const TextStyle(
-              color: Color.fromARGB(255, 12, 0, 67),
-              fontSize: 40,
-              fontWeight: FontWeight.bold,
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Win Point  $winPoint |',
+                  style: const TextStyle(
+                    color: Color.fromARGB(255, 151, 113, 0),
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text(
+                  '| Point  $point',
+                  style: const TextStyle(
+                    color: Color.fromARGB(255, 12, 0, 67),
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
           ),
           Container(
@@ -321,7 +358,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
               for (int i = 0; i < 3; i++)
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -333,34 +370,45 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                           checkCard(preditButton[i]);
                           cardkey.currentState!.filpCard();
                           enableButton = false;
-                          enableNextRound = true;
+                          roundCount = 5;
+                          roundCounter();
+
                           setState(() {});
                         }
                       : null,
                   child: Text(
                     preditButton[i],
-                    style: TextStyle(fontSize: 20),
+                    style: const TextStyle(fontSize: 20),
                   ),
                 ),
             ],
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.all(20),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            onPressed: enableNextRound
-                ? () {
-                    timeCount = 5;
-                    nextRound();
-                    startTimeCount();
-                  }
-                : null,
-            child: const Text(
-              'Next Round',
-              style: TextStyle(fontSize: 20),
+          SizedBox(
+            width: width * 0.9,
+            height: high * 0.2,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      'Round Begin',
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        fontSize: 40,
+                      ),
+                    ),
+                    Text(
+                      '$roundCount',
+                      style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 90,
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
