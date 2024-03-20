@@ -64,6 +64,11 @@ class _MenuScreenState extends State<MenuScreen> {
               ),
               const SizedBox(height: 30),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange[200],
+                    padding: const EdgeInsets.all(30),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30))),
                 onPressed: () {
                   if (formController.currentState!.validate()) {
                     Navigator.of(context).push(

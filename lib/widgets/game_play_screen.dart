@@ -128,14 +128,13 @@ class _GamePlayScreenState extends State<GamePlayScreen>
       default:
     }
     if (point == winPoint) {
-      roundCount = 0;
-      timeCount = 0;
-      time?.cancel();
-      roundTime.cancel();
-      setState(() {});
       showDialog(
         context: context,
         builder: (_) {
+          roundCount = 0;
+          timeCount = 0;
+          time?.cancel();
+          roundTime.cancel();
           return AlertDialog(
             alignment: Alignment.center,
             content: SizedBox(
