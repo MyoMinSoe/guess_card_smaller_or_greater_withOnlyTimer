@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:html';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -211,6 +210,7 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
     return Container(
       color: Colors.pink.withOpacity(0.2),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           Text(
             'If You get $winPoint Point, You Win !',
@@ -320,6 +320,12 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
             children: [
               for (int i = 0; i < 3; i++)
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.all(20),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
                   onPressed: enableButton
                       ? () {
                           timeCount = 0;
@@ -331,11 +337,20 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                           setState(() {});
                         }
                       : null,
-                  child: Text(preditButton[i]),
+                  child: Text(
+                    preditButton[i],
+                    style: TextStyle(fontSize: 20),
+                  ),
                 ),
             ],
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.all(20),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
             onPressed: enableNextRound
                 ? () {
                     timeCount = 5;
@@ -343,7 +358,10 @@ class _MainScreenState extends State<MainScreen> with TickerProviderStateMixin {
                     startTimeCount();
                   }
                 : null,
-            child: Text('Next Round'),
+            child: const Text(
+              'Next Round',
+              style: TextStyle(fontSize: 20),
+            ),
           ),
         ],
       ),
